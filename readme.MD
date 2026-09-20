@@ -490,3 +490,12 @@ impl<'info> Refund<'info> {
 
 In here, we will check if the fundrasing has already met the target and if ir passed the duration time.
 After doing the proper checks, we transfer the donated funds from the vault back to the contributor
+
+
+## Feature: Fundraiser Milestones
+
+The fundraiser tracks when the campaign first crosses 25%, 50%, and 75% of its target. A `u8` bitmask stored on the Fundraiser account records which milestones have already fired, and each milestone may only fire once.
+
+Milestones are checked after a successful contribution updates the campaign total, so a contribution that jumps across a threshold still triggers it. Milestones are intentionally one-way: later refunds do not clear them because they represent historical progress reached by the campaign.
+
+A dishonest contributor may try to cross the same threshold repeatedly or jump across a boundary in one transaction. The program therefore enforces milestone state on-chain rather than relying on the client.
