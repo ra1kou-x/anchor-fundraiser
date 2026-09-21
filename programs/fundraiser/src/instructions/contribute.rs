@@ -17,6 +17,13 @@ use crate::{
     PERCENTAGE_SCALER, SECONDS_TO_DAYS
 };
 
+#[event]
+pub struct MilestoneReached {
+    pub fundraiser: Pubkey,
+    pub quarter: u8,
+    pub amount: u64,
+}
+
 #[derive(Accounts)]
 pub struct Contribute<'info> {
     #[account(mut)]
@@ -128,6 +135,12 @@ impl<'info> Contribute<'info> {
 
             if self.fundraiser.milestones_fired & flag == 0 {
                 self.fundraiser.milestones_fired |= flag;
+
+                emit!(MilestoneReached {
+                    fundraiser: self.fundraiser.key(),
+                    quarter: (i + 1) as u8,
+                    amount: self.fundraiser.current_amount,
+                });
             }
         }
 
